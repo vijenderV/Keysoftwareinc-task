@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<beans:beans xsi:schemaLocation="http://www.springframework.org/schema/beans
+ http://www.springframework.org/schema/beans/spring-beans.xsd
+ http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns="http://www.springframework.org/schema/security">
+
+    <http auto-config="true">
+        <form-login login-page="/login"
+                    authentication-failure-url="/home/loginError"
+                    authentication-success-handler-ref="CustomSuccessHandler"
+                    login-processing-url="/home/login2"
+                    username-parameter="uname"
+                    password-parameter="upassword"/>
+
+        <logout logout-url="/logout" logout-success-url="/home/loginAndSignUp"
+                invalidate-session="true"/>
+
+        <csrf disabled="true" />
+
+    </http>
+    <authentication-manager>
+        <authentication-provider>
+            <password-encoder ref="bcrypt"/>
+            <jdbc-user-service
+                    authorities-by-username-query="select uname,urole from user where uname=?"
+                    users-by-username-query="select uname,concat(upassword),1 from user where uname=?" data-source-ref="dataSource"/>
+        </authentication-provider>
+    </authentication-manager>
+
+
+
+    <beans:import resource="spring-servlet.xml"/>
+    <beans:bean id="bcrypt" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+
+    <beans:bean id="CustomSuccessHandler" class="com.restaurentmanagement.handlers.CustomSuccessHandler"/>
+
+
+</beans:beans>
